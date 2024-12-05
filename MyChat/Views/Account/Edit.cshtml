@@ -1,0 +1,51 @@
+﻿@model MyChat.ViewModels.EditViewModel
+
+@{
+    ViewBag.Title = "Edit Profile";
+}
+
+<div class="bg-dark text-center pt-5 pb-4 border-radius-1">
+    <h3 class="text-white mb-5">Заполните форму для редактирования аккаунта</h3>
+    <form asp-action="Edit" asp-controller="Account" asp-anti-forgery="true">
+        <div asp-validation-summary="ModelOnly" class="text-error"></div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="text" class="form-control" asp-for="UserName" placeholder="Введите логин...">
+                <span asp-validation-for="UserName" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="email" class="form-control" asp-for="Email" placeholder="Введите ваш адрес электронной почты...">
+                <span asp-validation-for="Email" class="text-error" />
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <span class="text-error">@ViewBag.ErrorMessage</span>
+                }
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="date" class="form-control" asp-for="DateOfBirth" placeholder="Укажите дату рождения...">
+                <span asp-validation-for="DateOfBirth" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="text" class="form-control" asp-for="Avatar" placeholder="Введите ссылку на аватар...">
+                <span asp-validation-for="Avatar" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="password" class="form-control" asp-for="Password" placeholder="Введите пароль...">
+                <span asp-validation-for="Password" class="text-error" />
+            </label>
+        </div>
+        <button type="submit" class="btn btn-outline-light mb-3 w-25">Сохранить</button>
+    </form>
+</div>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

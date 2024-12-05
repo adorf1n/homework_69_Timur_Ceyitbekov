@@ -1,0 +1,36 @@
+@model List<User>
+
+@{
+    ViewBag.Title = "All users";
+}
+
+<table class="table table-striped">
+    <thead class="table-dark">
+    <tr>
+        <th>Пользователи</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var a in Model)
+    {
+        <tr>
+            <td>
+                <img src="@a.Avatar" alt="User avatar" class="rounded-circle me-2 comment-user-avatar">
+                <strong class="mb-0">@a.UserName</strong>
+            </td>
+            <td>
+                @if (a.LockoutEnd.HasValue)
+                {
+                    <a asp-action="UnblockUser" asp-route-userId="@a.Id" class="btn btn-outline-success">Разблокировать</a>
+                }
+                else
+                {
+                    <a asp-action="BlockUser" asp-route-userId="@a.Id" class="btn btn-outline-danger">Блокировать</a>
+                }
+                <a asp-action="UserEdit" asp-route-userId="@a.Id" class="btn btn-outline-dark ml-1">Редактировать</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

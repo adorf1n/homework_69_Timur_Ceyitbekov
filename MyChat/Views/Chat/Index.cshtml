@@ -1,0 +1,162 @@
+﻿@model IEnumerable<MyChat.Models.Message>
+
+@{
+    ViewBag.Title = "Main page - Chat";
+}
+
+<div class="mt-4">
+    <div class="row">
+        <div class="bg-dark text-white pt-2 pb-2 text-center">
+            <h3>Добро пожаловать в чат</h3>
+        </div>
+        <div class="col-12 border rounded chat">
+            <div id="messages-container" class="p-2">
+                @foreach (var m in Model)
+                {
+                    var alignmentClass = m.User.UserName == User.Identity.Name ? "text-end" : "text-start";
+                    var messageClass = m.User.UserName == User.Identity.Name ? "my-message" : "other-message";
+
+                    <div id="message-@m.Id" class="mt-2 @alignmentClass border-bottom border-secondary pb-2 message-item">
+                        <div class="message @messageClass">
+                            <img src="@m.User.Avatar" alt="User avatar" class="rounded-circle comment-user-avatar">
+                            <a class="text-decoration-none text-black" asp-action="Profile" asp-route-userid="@m.UserId" asp-controller="Account"><strong>@m.User.UserName</strong></a>
+                            <span class="text-muted small">@m.DateOfDispatch</span>
+                            <div>@m.Inscription</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="row bg-dark pt-3 pb-3">
+        <form id="message-form" class="d-flex w-100">
+            <div class="flex-grow-1 me-2">
+                <input type="text" id="message-input" class="form-control" placeholder="Введите сообщение..." required maxlength="150">
+                <div id="char-count" class="text-muted small mt-1">Осталось <span id="remaining-chars">150</span> символов</div>
+            </div>
+            <div class="message-button">
+                <button type="submit" class="btn btn-outline-light w-100">Отправить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        $(document).ready(function () {
+            const maxLength = 150;
+            const messageInput = $('#message-input');
+            const remainingChars = $('#remaining-chars');
+
+            messageInput.on('input', function () {
+                const charsLeft = maxLength - messageInput.val().length;
+                remainingChars.text(charsLeft);
+            });
+            
+            $('#message-form').on('submit', function (e) {
+                e.preventDefault(); 
+
+                const messageText = $('#message-input').val().trim();
+                if (!messageText) return;
+
+                console.log('Отправка сообщения:', messageText);
+
+                $.ajax({
+                    url: '/Chat/Create',
+                    type: 'POST',
+                    data: { inscription: messageText },  
+                    success: function (response) {
+                        console.log('Сообщение отправлено успешно:', response);
+
+                        $('#message-input').val('');
+                        remainingChars.text(maxLength);
+                        
+                        appendMessage({
+                            userName: response.userName,
+                            avatar: response.avatar,
+                            inscription: messageText,
+                            dateOfDispatch: new Date().toLocaleString(),
+                            isCurrentUser: true,
+                            messageId: response.messageId 
+                        });
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('Ошибка при отправке сообщения:', status, error);
+                        alert('Произошла ошибка при отправке сообщения.');
+                    }
+                });
+            });
+
+            let lastMessageTime = new Date().toISOString();
+            
+            function loadMessages() {
+                console.log("Загружаем последние 30 сообщений...");
+
+                $.ajax({
+                    url: '/Chat/GetLatestMessages',
+                    type: 'GET',
+                    data: { lastMessageTime: lastMessageTime },
+                    success: function (response) {
+                        console.log('Ответ от сервера для загрузки сообщений:', response);
+
+                        if (response.messages && response.messages.length > 0) {
+                            lastMessageTime = response.messages[response.messages.length - 1].dateOfDispatch;
+
+                            console.log(`Загружено ${response.messages.length} новых сообщений.`);
+
+                            response.messages.forEach(msg => {
+
+                                var date = `${msg.dateOfDispatch.split("T")[0].split("-").reverse().join(".")} ${msg.dateOfDispatch.split("T")[1].split(".")[0]}`
+                                console.log(date)
+                                console.log(date)
+                                console.log(date)
+                                console.log(date)
+                                
+                                appendMessage({
+                                    userName: msg.userName,
+                                    avatar: msg.avatar,
+                                    inscription: msg.inscription,
+                                    dateOfDispatch: date,
+                                    isCurrentUser: msg.userName === response.currentUser,
+                                    messageId: msg.id 
+                                });
+                            });
+                        } else {
+                            console.log("Нет новых сообщений");
+                        }
+                    },
+                    error: function () {
+                        console.error('Ошибка при получении сообщений');
+                    }
+                });
+            }
+            
+            function appendMessage({ userName, avatar, inscription, dateOfDispatch, isCurrentUser, messageId }) {
+                if ($(`#message-${messageId}`).length > 0) {
+                    return;
+                }
+
+                const alignmentClass = isCurrentUser ? "text-end" : "text-start";
+                const messageClass = isCurrentUser ? "my-message" : "other-message";
+                const userProfileUrl = `/Account/Profile?userid=${userName}`;
+
+                const newMessage = `
+                    <div id="message-${messageId}" class="mt-2 ${alignmentClass} border-bottom border-secondary pb-2 message-item">
+                        <div class="message ${messageClass}">
+                            <img src="${avatar}" alt="User avatar" class="rounded-circle comment-user-avatar">
+                            <a class="text-decoration-none text-black" href="${userProfileUrl}">
+                                <strong>${userName}</strong>
+                            </a>
+                            <span class="text-muted small">${dateOfDispatch}</span>
+                            <div>${inscription}</div>
+                        </div>
+                    </div>
+                `;
+
+                $('#messages-container').append(newMessage);
+            }
+            setInterval(loadMessages, 5000);
+        });
+    </script>
+}

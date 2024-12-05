@@ -1,0 +1,25 @@
+﻿@model User
+
+@{
+    ViewBag.Title = "User profile";
+}
+
+<div class="mt-4">
+    <div class="row align-items-center">
+        <div class="col-md-3 text-center">
+            <img src="@Model.Avatar" class="img-thumbnail avatar-block rounded-circle" alt="User avatar">
+        </div>
+        <div class="col-md-9">
+            <div class="d-flex align-items-center mb-2">
+                <h2 class="me-3">@Model.UserName</h2>
+                @if (ViewBag.CurrentUser == Model.Id)
+                {
+                    <a asp-action="Edit" asp-controller="Account" asp-route-userId="@ViewBag.currentUserId" class="btn btn-outline-secondary">Редактировать</a>
+                    <a class="btn btn-outline-danger ml-1" asp-controller="Account" asp-action="Logout">Выйти</a>
+                }
+            </div>
+            <h6 class="text-muted">@Model.DateOfBirth.ToString("dd.MM.yyyy")</h6>
+            <h6 class="text-muted">Количество отправленных сообщений @ViewBag.Messages</h6>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+@model MyChat.ViewModels.RegisterViewModel
+
+@{
+   ViewBag.Title = "Registration page";
+}
+
+<div class="bg-dark text-center pt-5 pb-4 border-radius-1">
+    <h3 class="text-white mb-5">Заполните форму для регистрации</h3>
+    <form asp-action="RegisterUser" asp-controller="Account" asp-anti-forgery="true">
+        <div asp-validation-summary="ModelOnly" class="text-error"></div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="text" class="form-control" asp-for="UserName" placeholder="Введите логин...">
+                <span asp-validation-for="UserName" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="email" class="form-control" asp-for="Email" placeholder="Введите ваш адрес электронной почты...">
+                <span asp-validation-for="Email" class="text-error" />
+                @if (ViewBag.ErrorMessage != null)
+                {
+                    <span class="text-error">@ViewBag.ErrorMessage</span>
+                }
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="date" class="form-control" asp-for="DateOfBirth" placeholder="Укажите дату рождения...">
+                <span asp-validation-for="DateOfBirth" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="text" class="form-control" asp-for="Avatar" placeholder="Введите ссылку на аватар...">
+                <span asp-validation-for="Avatar" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="password-input" class="col-4 position-relative">
+                <input type="password" id="password-input" class="form-control" asp-for="Password" placeholder="Введите пароль...">
+                <i id="toggle-password" class="fa-solid fa-eye position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+            </label> <br/>
+            <span asp-validation-for="Password" class="text-error text-center col-6" />
+        </div>
+        <div class="form_row mb-3">
+            <label for="confirm-password-input" class="col-4 position-relative">
+                <input type="password" id="confirm-password-input" class="form-control" asp-for="ConfirmPassword" placeholder="Подтвердите пароль...">
+                <i id="toggle-confirm-password" class="fa-solid fa-eye position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+            </label> <br/>
+            <span asp-validation-for="ConfirmPassword" class="text-error col-6 text-center" />
+            
+        </div>
+        <button type="submit" class="btn btn-outline-light mb-3 w-25">Зарегистрироваться</button>
+    </form>
+</div>
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = $("#password-input");
+            const confirmPasswordInput = $("#confirm-password-input");
+            const passwordVisible = passwordInput.attr("type") === "text";
+            const newType = passwordVisible ? "password" : "text";
+            passwordInput.attr("type", newType);
+            confirmPasswordInput.attr("type", newType);
+            if (passwordVisible) {
+                $("#toggle-password").removeClass("fa-eye-slash").addClass("fa-eye");
+                $("#toggle-confirm-password").removeClass("fa-eye-slash").addClass("fa-eye");
+            } else {
+                $("#toggle-password").removeClass("fa-eye").addClass("fa-eye-slash");
+                $("#toggle-confirm-password").removeClass("fa-eye").addClass("fa-eye-slash");
+            }
+        }
+        $(document).on("click", "#toggle-password, #toggle-confirm-password", function () {
+            togglePasswordVisibility();
+        });
+    </script>
+}

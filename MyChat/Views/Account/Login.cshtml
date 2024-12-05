@@ -1,0 +1,53 @@
+﻿@model MyChat.ViewModels.LoginViewModel
+
+@{
+    ViewBag.Title = "Login page";
+}
+
+<div class="bg-dark text-center pt-5 pb-4 border-radius-1">
+    <h3 class="text-white mb-5">Заполните форму для входа в аккаунт</h3>
+    <form asp-action="Login" asp-controller="Account" asp-anti-forgery="true">
+        <div asp-validation-summary="ModelOnly" class="text-error"></div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input type="text" class="form-control" asp-for="Identifier" placeholder="Введите ваш логин или почту...">
+                <span asp-validation-for="Identifier" class="text-error" />
+            </label>
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4 position-relative">
+                <input type="password" class="form-control" id="password-input" asp-for="Password" placeholder="Введите пароль...">
+                <i id="toggle-password" class="fa-solid fa-eye position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer;"></i>
+            </label> <br/>
+            <span asp-validation-for="Password" class="text-error col-6 text-center" />
+        </div>
+        <div class="form_row mb-3">
+            <label for="" class="col-4">
+                <input class="form-check-input" type="checkbox" asp-for="RememberMe" id="flexCheckChecked" checked>
+                  <label class="form-check-label text-white" for="flexCheckChecked">Запомнить меня?</label>
+            </label>
+        </div>
+        <button type="submit" class="btn btn-outline-light mb-3 w-25">Войти</button>
+    </form>
+</div>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = $("#password-input");
+            const passwordVisible = passwordInput.attr("type") === "text";
+            const newType = passwordVisible ? "password" : "text";
+            passwordInput.attr("type", newType);
+
+            if (passwordVisible) {
+                $("#toggle-password").removeClass("fa-eye-slash").addClass("fa-eye");
+            } else {
+                $("#toggle-password").removeClass("fa-eye").addClass("fa-eye-slash");
+            }
+        }
+        $(document).on("click", "#toggle-password", function () {
+            togglePasswordVisibility();
+        });
+    </script>
+}
